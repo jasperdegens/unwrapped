@@ -1,4 +1,4 @@
-export default function DegenGradient() {
+export function DegenGradient() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10">
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
@@ -54,3 +54,5 @@ export default function DegenGradient() {
     </div>
   )
 }
+
+export default DegenGradient
