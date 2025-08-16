@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DegenBG } from '@/components/DegenGradient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -27,20 +26,20 @@ export default function TestPage() {
 
 		try {
 			console.log('[v0] Testing generation for:', address)
-			const response = await fetch('/api/generate', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ address, force: true }),
-			})
+			// const response = await fetch('/api/generate', {
+			// 	method: 'POST',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify({ address, force: true }),
+			// })
 
-			const data = await response.json()
-			console.log('[v0] Generation response:', data)
+			// const data = await response.json()
+			// console.log('[v0] Generation response:', data)
 
-			if (!response.ok) {
-				throw new Error(data.error || 'Generation failed')
-			}
+			// if (!response.ok) {
+			// 	throw new Error(data.error || 'Generation failed')
+			// }
 
-			setResult(data)
+			// setResult(data)
 		} catch (err) {
 			console.log('[v0] Generation error:', err)
 			setError(err instanceof Error ? err.message : 'Unknown error')
@@ -56,7 +55,7 @@ export default function TestPage() {
 
 		try {
 			console.log('[v0] Testing single generator:', generatorId, 'for:', address)
-			const response = await fetch('/api/test-generator', {
+			const response = await fetch('/api/generate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ address, generatorId }),
@@ -80,7 +79,6 @@ export default function TestPage() {
 
 	return (
 		<div className="min-h-screen relative">
-			<DegenBG />
 			<div className="relative z-10 container mx-auto px-4 py-8">
 				<Card className="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border-slate-600">
 					<CardHeader>
@@ -88,7 +86,9 @@ export default function TestPage() {
 					</CardHeader>
 					<CardContent className="space-y-6">
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-slate-300">Wallet Address to Test</label>
+							<label htmlFor="address" className="text-sm font-medium text-slate-300">
+								Wallet Address to Test
+							</label>
 							<Input
 								value={address}
 								onChange={(e) => setAddress(e.target.value)}

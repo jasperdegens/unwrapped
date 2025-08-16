@@ -71,10 +71,18 @@ export const AccountMetadataGen: WrappedCardGeneratorSpec = {
 		}
 	},
 	dataPrompt: prompt,
-	//   mediaPrompt: `
-	// Craft an SVG (1200x630) horizontal bar chart from "highlights".
-	// Bars labeled by "label", width ∝ USD (parsed from "value"). Return:
-	// { "kind":"svg", "svg":"<svg>...</svg>" }.
-	// Use bold, neon gradient vibes.
-	// `,
+	mediaPrompt: `
+    You are to generate a creative SVG that tries to capture the key highlights of the account. Include 100 shapes. Have the color scheme match the persona. Try to make decals and shapes that represent the persona of this account. Personas are:
+    1) **Builder** — smart_contract_deployments ≥ 1 (≥3 → “Protocol Tinkerer” flair)
+    2) **Bridge Nomad** — bridge_transactions_performed ≥ 10
+    3) **DeFi Degen** — lend_borrow_stake_transactions ≥ 50
+    4) **Serial Swapper** — token_swaps_performed ≥ 100
+    5) **Power User** — total_transactions ≥ 1,000 OR (unique_days_active ≥ 180 AND activity_period_days ≥ 365)
+    6) **ENS Native** — ens_contract_interactions ≥ 10
+    7) **Streak Lord** — longest_active_streak ≥ 30 OR current_active_streak ≥ 14
+    8) **Weekend Warrior** — unique_days_active ≤ 30 but total_transactions ≥ 100 (bursty)
+    9) **Newcomer** — activity_period_days < 30 OR total_transactions < 20
+    10) **Balanced Voyager** — fallback when none dominate
+    11) **Lil Noob** - when all else fails, just say "Lil Noob
+`,
 }

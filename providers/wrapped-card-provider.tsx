@@ -17,6 +17,7 @@ type WrappedCardAction =
 	| { type: 'SET_LOADING'; payload: boolean }
 	| { type: 'SET_ERROR'; payload: string | null }
 	| { type: 'SET_COLLECTION'; payload: WrappedCardCollection | null }
+	| { type: 'SET_ADDRESS'; payload: string }
 	| { type: 'ADD_CARD'; payload: WrappedCard }
 	| { type: 'SET_GENERATION_STATUS'; payload: 'idle' | 'pending' | 'generating' | 'completed' | 'failed' }
 	| { type: 'SET_POLLING_ID'; payload: string | null }
@@ -42,6 +43,29 @@ function wrappedCardReducer(state: WrappedCardState, action: WrappedCardAction):
 
 		case 'SET_COLLECTION':
 			return { ...state, collection: action.payload }
+
+		case 'SET_ADDRESS': {
+			if (state.collection) {
+				// Update existing collection address
+				return {
+					...state,
+					collection: {
+						...state.collection,
+						address: action.payload as `0x${string}`,
+					},
+				}
+			} else {
+				// Create new blank collection with address
+				return {
+					...state,
+					collection: {
+						address: action.payload as `0x${string}`,
+						cards: [],
+						timestamp: new Date().toISOString(),
+					},
+				}
+			}
+		}
 
 		case 'ADD_CARD': {
 			if (!state.collection) return state
@@ -73,6 +97,7 @@ function wrappedCardReducer(state: WrappedCardState, action: WrappedCardAction):
 interface WrappedCardContextType {
 	// State
 	collection: WrappedCardCollection | null
+	address: string | null
 	isLoading: boolean
 	error: string | null
 	generationStatus: 'idle' | 'pending' | 'generating' | 'completed' | 'failed'
@@ -80,6 +105,7 @@ interface WrappedCardContextType {
 
 	// Actions
 	setCollection: (collection: WrappedCardCollection | null) => void
+	setAddress: (address: string) => void
 	addCard: (card: WrappedCard) => void
 	setGenerationStatus: (status: 'idle' | 'pending' | 'generating' | 'completed' | 'failed') => void
 	setLoading: (loading: boolean) => void
@@ -111,6 +137,10 @@ export function WrappedCardProvider({ children }: WrappedCardProviderProps) {
 		dispatch({ type: 'SET_COLLECTION', payload: collection })
 	}, [])
 
+	const setAddress = useCallback((address: string) => {
+		dispatch({ type: 'SET_ADDRESS', payload: address })
+	}, [])
+
 	const addCard = useCallback((card: WrappedCard) => {
 		dispatch({ type: 'ADD_CARD', payload: card })
 	}, [])
@@ -139,6 +169,7 @@ export function WrappedCardProvider({ children }: WrappedCardProviderProps) {
 	const hasCards = state.collection ? state.collection.cards.length > 0 : false
 	const cardCount = state.collection ? state.collection.cards.length : 0
 	const isGenerating = state.generationStatus === 'pending' || state.generationStatus === 'generating'
+	const address = state.collection?.address || null
 
 	// Stop polling
 	const stopPolling = useCallback(() => {
@@ -217,6 +248,7 @@ export function WrappedCardProvider({ children }: WrappedCardProviderProps) {
 	const contextValue: WrappedCardContextType = {
 		// State
 		collection: state.collection,
+		address,
 		isLoading: state.isLoading,
 		error: state.error,
 		generationStatus: state.generationStatus,
@@ -224,6 +256,7 @@ export function WrappedCardProvider({ children }: WrappedCardProviderProps) {
 
 		// Actions
 		setCollection,
+		setAddress,
 		addCard,
 		setGenerationStatus,
 		setLoading,

@@ -1,36 +1,91 @@
-# 🚀 wallet unwrapped - flex your degen lore 💎
+# Unwrapped
 
-*Drop your addy, get your on-chain wrapped. No cap.*
+A Web3 wrapped card generator with Redis caching.
 
-## 🎯 What is this degen app?
+## Features
 
-**wallet unrapped** is like Spotify Wrapped but for your Ethereum wallet. Drop your address and get a sick summary of your on-chain degeneracy:
+- Generate wrapped cards for different generator types
+- Redis caching for improved performance
+- Smooth animations and transitions
+- Support for multiple card types
 
-- 💰 **Top Bags** - Your biggest holdings (and biggest mistakes)
-- 📈 **Best Trades** - When you actually made it (rare)
-- 🖼️ **NFT Flexes** - Your JPEG collection worth more than your car
-- 💸 **Rug Pulls** - The tokens that went to zero (RIP)
-- 🔥 **Degen Score** - How much of a true degen you really are
+## Environment Variables
 
-## 🛠️ Tech Stack
+### Redis Configuration
+```bash
+# Redis connection URL (optional, defaults to localhost:6379)
+REDIS_URL=redis://localhost:6379
 
-- **OpenSea MCP** 
-- **Hypergraph**
-- **Next.js 14**
-- **TypeScript**
-- **Tailwind CSS**
-- **Vercel Blob**
-- **AI SDK**
+# For production, you might use:
+REDIS_URL=redis://username:password@host:port
+```
 
+### App Configuration
+```bash
+# Your app's public URL (required for server-side redirects)
+NEXT_PUBLIC_APP_URL=https://yourapp.com
 
-## Journey Notes
-- Vercel's ai sdk only seems to output structured output will tools on gpt-4o
-- Verbosity of some tool calls leading to quick rate limits
-- OpenSea's MCP does not do well with time queries, so queries are time independent
-- Getting majorly rate limited by OpenAi
-- TypeSync needs mapping file already created and in specific dir, which is a bit annoying
+# For local development:
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
+## Redis Caching
 
-## 📜 License
+The application uses Redis to cache generated cards for 24 hours. This improves performance by:
 
-MIT License - Do whatever you want, just don't rug us.
+- Avoiding regeneration of the same cards
+- Reducing API calls to external services
+- Providing faster response times for repeated requests
+
+### Cache Key Format
+```
+card:{generatorId}:{address}
+```
+
+Example: `card:top-tokens:0x1234567890abcdef1234567890abcdef12345678`
+
+### Cache Functions
+
+- `storeCard(generatorId, address, card)` - Stores a generated card
+- `getCard(generatorId, address)` - Retrieves a cached card
+- `isRedisAvailable()` - Checks if Redis is configured
+
+## Development
+
+```bash
+# Install dependencies
+bun install
+
+# Start development server
+bun dev
+
+# Build for production
+bun build
+```
+
+## API Endpoints
+
+### POST /api/test-generator
+Test a single generator with caching support.
+
+**Request Body:**
+```json
+{
+  "address": "0x1234567890abcdef1234567890abcdef12345678",
+  "generatorId": "top-tokens"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "generatorId": "top-tokens",
+  "address": "0x1234567890abcdef1234567890abcdef12345678",
+  "card": { ... },
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "cached": false
+}
+```
+
+The `cached` field indicates whether the result was retrieved from cache (`true`) or newly generated (`false`).

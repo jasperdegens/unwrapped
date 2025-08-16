@@ -5,7 +5,7 @@ export type WrappedMedia =
 	| { kind: 'svg'; svg: string; alt?: string }
 	| { kind: 'jsx'; jsx: string; alt?: string } // feature flag if needed
 
-export type WrappedHighlight = { label: string; value: string }
+export type WrappedHighlight = { label: string; value: string; image?: string }
 
 export interface WrappedCard {
 	kind: WrappedCardKind

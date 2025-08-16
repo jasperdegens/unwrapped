@@ -1,21 +1,14 @@
-import { z } from 'zod'
-import { type UnifiedCardData, UnifiedCardDataSchema } from '@/schemas/unified'
+import { MediaSchema, type UnifiedCardData, UnifiedCardDataSchema } from '@/schemas/unified'
 import type { WrappedCardGeneratorSpec } from '@/types/generator'
 import type { WrappedCard, WrappedMedia } from '@/types/wrapped'
 import type { BuilderDeps } from './deps'
-import { DATA_SYSTEM_PROMPT } from './prompts'
+import { DATA_SYSTEM_PROMPT, MEDIA_SYSTEM_PROMPT } from './prompts'
 
 // Standard system prompt templates
 const SYSTEM_PROMPTS = {
 	data: DATA_SYSTEM_PROMPT,
 	media: `Return exactly ONE media object as JSON.`,
 } as const
-
-// Media schema for generation
-const MediaSchema = z.union([
-	z.object({ kind: z.literal('url'), src: z.string().url(), alt: z.string().optional() }),
-	z.object({ kind: z.literal('svg'), svg: z.string(), alt: z.string().optional() }),
-])
 
 const addVarsToPrompt = (prompt: string, vars: { address: `0x${string}` } & Record<string, unknown>) => {
 	// check if prompt contains string template for address, otherwise include at the start of the prompt
@@ -24,6 +17,11 @@ const addVarsToPrompt = (prompt: string, vars: { address: `0x${string}` } & Reco
 		prompt = prompt.replace(addressTemplate, vars.address)
 	} else {
 		prompt = `The user's address is: ${vars.address}.\n\n${prompt}`
+	}
+
+	// automatically add in data as well if it exists
+	if (vars.cardData) {
+		prompt = `Card data is: ${vars.cardData}.\n\n${prompt}`
 	}
 
 	// replace all other variables
@@ -67,11 +65,11 @@ async function generateCardMedia(
 	ai: BuilderDeps['ai'],
 	sanitizeSvg: BuilderDeps['sanitizeSvg'],
 	generator: WrappedCardGeneratorSpec,
-	vars: { address: `0x${string}`; snapshotAt: string },
+	vars: { address: `0x${string}`; snapshotAt: string } & Record<string, unknown>,
 	data: UnifiedCardData,
+	openai: BuilderDeps['openai'],
 	tmpDir?: string,
-	upload?: BuilderDeps['upload'],
-	openai?: BuilderDeps['openai']
+	upload?: BuilderDeps['upload']
 ): Promise<WrappedMedia | undefined> {
 	if (generator.mediaProcessor) {
 		console.log(`[v0] Using mediaProcessor for ${generator.kind}`)
@@ -85,14 +83,16 @@ async function generateCardMedia(
 		})
 	}
 
+	// add the data property as vars in case of prompt hydration
+	vars = { ...vars, cardData: JSON.stringify(data, null, 2) }
+
 	if (generator.mediaPrompt) {
 		console.log(`[v0] Using mediaPrompt for ${generator.kind}`)
 		const mediaResult = await ai.callStructuredJSON({
-			system: SYSTEM_PROMPTS.media,
+			system: MEDIA_SYSTEM_PROMPT,
 			prompt: addVarsToPrompt(generator.mediaPrompt, vars),
 			schema: MediaSchema,
 			vars,
-			context: data,
 		})
 
 		// Sanitize SVG if present
@@ -138,8 +138,30 @@ export async function buildWrappedCard(
 		}
 
 		// 1) Generate card data
-		const data = await generateCardData(ai, generator, vars)
-
+		// const data = await generateCardData(ai, generator, vars)
+		const data = {
+			leadInText: 'On-chain vibe check:',
+			revealText: 'Balanced Voyager with 240 tx — steady strides.',
+			highlights: [
+				{
+					label: 'Total tx',
+					value: '240',
+				},
+				{
+					label: 'Active days',
+					value: '117d',
+				},
+				{
+					label: 'Swaps',
+					value: '18',
+				},
+				{
+					label: 'DeFi ops',
+					value: '14',
+				},
+			],
+			footnote: 'Active for over 1,666 days!',
+		}
 		// // Validate required fields
 		// if (!validateCardData(data, generator.kind)) {
 		// 	return null
