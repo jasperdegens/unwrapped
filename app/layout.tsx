@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Fredoka, Space_Mono } from 'next/font/google'
 import type React from 'react'
 import { WrappedCardProvider } from '@/providers/wrapped-card-provider'
+import DegenBG from '@/components/DegenBG'
 import './globals.css'
 
 const fredoka = Fredoka({
@@ -45,6 +46,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={`${fredoka.variable} ${spaceMono.variable} antialiased dark`}>
 			<body>
+        <DegenBG />
 				<WrappedCardProvider>{children}</WrappedCardProvider>
 			</body>
 		</html>

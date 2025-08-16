@@ -1,5 +1,4 @@
 'use client'
-import DegenBG from '@/components/DegenGradient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,7 +6,6 @@ import { Input } from '@/components/ui/input'
 export default function Home() {
 	return (
 		<main className="min-h-screen text-slate-200">
-			<DegenBG />
 			<div className="mx-auto max-w-xl px-6 py-24 text-center">
 				<h1 className="text-6xl font-black leading-tight text-slate-100 mb-2 font-sans">wallet wrapped</h1>
 				<div className="text-lg font-bold text-slate-300 mb-4 font-sans">2024 Analytics</div>
