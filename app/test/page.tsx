@@ -10,6 +10,7 @@ const GENERATORS = [
 	{ id: 'top-tokens', name: 'Top Tokens', description: 'Shows top 5 tokens by USD value', order: 10 },
 	{ id: 'nft-entourage', name: 'NFT Entourage', description: 'Gallery of top 4 NFTs by value', order: 15 },
 	{ id: 'best-trade', name: 'Best Trade', description: 'Highest positive PnL trade from last 365 days', order: 20 },
+	{ id: 'account-metadata', name: 'Account Metadata', description: 'Account metadata', order: 1 },
 ]
 
 export default function TestPage() {

@@ -11,6 +11,10 @@ export interface WrappedCardGeneratorSpec {
 	tools?: string[] // allowed MCP tool names
 
 	// LLM route (optional if custom provided)
+	prePrompt?: (vars: {
+		address: `0x${string}`
+		snapshotAt: string
+	}) => Promise<{ address: `0x${string}`; snapshotAt: string } & Record<string, unknown>>
 	dataPrompt?: string // must return UnifiedCardData
 	mediaPrompt?: string // must return WrappedMedia
 
@@ -29,10 +33,5 @@ export type MediaProcessorArgs = DataProcessorArgs & {
 	tmpDir: string // '/tmp'
 	upload: (filePath: string) => Promise<{ url: string }>
 	ai: BuilderDeps['ai']
-	openai?: {
-		images: {
-			generate: (opts: any) => Promise<{ data: Array<{ url?: string; b64_json?: string }> }>
-			edits?: (opts: any) => Promise<any>
-		}
-	}
+	openai: BuilderDeps['openai']
 }

@@ -132,10 +132,13 @@ export async function buildWrappedCard(
 	const { ai, sanitizeSvg, tmpDir, upload, openai } = deps
 
 	try {
-		// 1) Generate card data
-		const data = {} //await generateCardData(ai, generator, vars)
+		// 0) Pre-generate data if needed
+		if (generator.prePrompt) {
+			vars = await generator.prePrompt(vars)
+		}
 
-		console.log(data)
+		// 1) Generate card data
+		const data = await generateCardData(ai, generator, vars)
 
 		// // Validate required fields
 		// if (!validateCardData(data, generator.kind)) {

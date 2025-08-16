@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { AccountMetadataGen } from '@/generators/account-metadata'
 import { BestTradeGen } from '@/generators/best-trade'
 import { NFTEntourageGen } from '@/generators/nft-entourage'
 import { TopTokensGen } from '@/generators/top-tokens'
@@ -12,6 +13,7 @@ const generatorMap = {
 	'top-tokens': TopTokensGen,
 	'best-trade': BestTradeGen,
 	'nft-entourage': NFTEntourageGen,
+	'account-metadata': AccountMetadataGen,
 }
 
 export async function POST(req: NextRequest) {

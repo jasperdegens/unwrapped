@@ -1,7 +1,6 @@
 import fs from 'node:fs'
-import { OpenAI, toFile } from 'openai'
+import { toFile } from 'openai'
 import sharp from 'sharp'
-import z from 'zod'
 import type { WrappedCardGeneratorSpec } from '@/types/generator'
 
 // Safer fetch -> validate -> normalize to PNG
@@ -33,27 +32,6 @@ async function fetchAndNormalizeToPng(url: string, name: string) {
 	// Return a File-like object with the correct content-type
 	return await toFile(new Blob([png], { type: 'image/png' }), `${name}.png`, {
 		type: 'image/png',
-	})
-}
-
-const nftMetadataSchema = z.object({
-	imageUrl: z.string(),
-	traits: z.array(
-		z.object({
-			trait_type: z.string(),
-			value: z.string(),
-		})
-	),
-})
-
-// Helper: download remote URL to buffer
-async function fetchImage(url: string) {
-	const res = await fetch(url)
-	const extension = url.split('.').pop()
-	const fileName = url.split('/').pop()
-	console.log(fileName)
-	return await toFile(res, fileName, {
-		type: `image/${extension}`,
 	})
 }
 
@@ -119,7 +97,7 @@ The leadInText should be something like, "Your NFT entourage is...
 	// { "kind":"svg", "svg":"<svg>...</svg>", "alt":"Top NFTs showcase" }.
 	// Include placeholder rectangles with gradient fills and "NFT" labels.
 	// `,
-	async mediaProcessor({ ai, data }) {
+	async mediaProcessor({ ai, data, openai, vars }) {
 		// const tokens = data.highlights
 		// if (!tokens) {
 		// 	return undefined
@@ -136,10 +114,6 @@ The leadInText should be something like, "Your NFT entourage is...
 
 		// log the urls
 		// console.log(nftMetadata)
-
-		const openai = new OpenAI({
-			apiKey: process.env.OPENAI_API_KEY,
-		})
 
 		const images = [
 			'https://i2.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/af1144d4fcc4877459f536624a8e78/baaf1144d4fcc4877459f536624a8e78.jpeg',
@@ -162,7 +136,10 @@ The leadInText should be something like, "Your NFT entourage is...
 		})
 
 		// save this to a file
-		fs.writeFileSync('./nft-entourage.png', Buffer.from(result.data?.[0]?.b64_json || '', 'base64'))
+		fs.writeFileSync(
+			`./images/${vars.address}-nft-entourage.png`,
+			Buffer.from(result.data?.[0]?.b64_json || '', 'base64')
+		)
 
 		// upload to imgbb
 		// upload to imgbb

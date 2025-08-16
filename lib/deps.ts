@@ -20,14 +20,13 @@ export type BuilderDeps = {
 			vars?: { address: `0x${string}` } & Record<string, unknown>
 			context?: any
 			timeoutMs?: number
-			openai?: { images: { generate: (opts: any) => Promise<{ data: Array<{ b64_json?: string; url?: string }> }> } }
 		}) => Promise<any>
 	}
 	mcpFactory: () => Promise<MCPClient>
 	sanitizeSvg?: (raw: string) => string
 	tmpDir: string
 	upload: (filePath: string) => Promise<{ url: string }>
-	openai?: { images: { generate: (opts: any) => Promise<{ data: Array<{ b64_json?: string; url?: string }> }> } }
+	openai: OpenAI
 }
 
 export const deps: BuilderDeps = {
@@ -74,7 +73,7 @@ export const deps: BuilderDeps = {
 					// 	console.log(step.toolResults?.map((result) => result?.error))
 					// },
 					abortSignal: controller.signal,
-					stopWhen: stepCountIs(20),
+					stopWhen: stepCountIs(10),
 				})
 				console.log(result.toolCalls)
 				console.log(result.toolResults)
@@ -150,28 +149,9 @@ export const deps: BuilderDeps = {
 		const apiKey = process.env.OPENAI_API_KEY
 		if (!apiKey) {
 			console.warn('OPENAI_API_KEY not set, OpenAI features disabled')
-			return undefined
+			throw new Error('OPENAI_API_KEY not set')
 		}
 
-		try {
-			const client = new OpenAI({ apiKey })
-			return {
-				images: {
-					generate: async (opts: any) => {
-						const response = await client.images.generate(opts)
-						// Map OpenAI response to expected interface
-						const mappedData =
-							response.data?.map((img) => ({
-								b64_json: img.b64_json,
-								url: img.url,
-							})) || []
-						return { data: mappedData }
-					},
-				},
-			}
-		} catch (error) {
-			console.error('Failed to initialize OpenAI client:', error)
-			return undefined
-		}
+		return new OpenAI({ apiKey })
 	},
 }
