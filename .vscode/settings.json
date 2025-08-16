@@ -1,0 +1,62 @@
+{
+	"editor.fontSize": 13,
+	"editor.fontLigatures": true,
+	"editor.formatOnSave": true,
+	"editor.accessibilitySupport": "off",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit"
+	},
+	"editor.defaultFormatter": "biomejs.biome",
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"search.exclude": {
+		"**/node_modules": true,
+		"archive": true
+	},
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"turbo.path": "./node_modules/.bin/turbo",
+	"tailwindCSS.lint.cssConflict": "error",
+	"tailwindCSS.emmetCompletions": true,
+	"tailwindCSS.experimental.configFile": {
+		"apps/play-network/src/globals.css": ["apps/play-network/**"]
+	},
+	"todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "CHAT", "[ ]", "[x]"],
+	"todo-tree.highlights.customHighlight": {
+		"BUG": {
+			"icon": "bug"
+		},
+		"HACK": {
+			"icon": "tools"
+		},
+		"FIXME": {
+			"icon": "flame",
+			"iconColour": "#FFA500"
+		},
+		"CHAT": {
+			"icon": "comment",
+			"iconColour": "#FFF"
+		},
+		"[ ]": {
+			"icon": "issue-draft"
+		},
+		"[x]": {
+			"icon": "issue-closed"
+		}
+	},
+	"tailwindCSS.classAttributes": ["class", "className", "ngClass", "tw"],
+	"biome_lsp.trace.server": "messages",
+	"biome.searchInPath": false,
+	"tinybird.venv": ".venv",
+	"tinybird.dataProjectSubdir": "./packages/analytics",
+	"todo-tree.regex.regex": "(//|#|-- |<!--|;|/\\*|^|^[ \\t]*(-|\\d+.))\\s*($TAGS)"
+}

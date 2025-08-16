@@ -63,36 +63,14 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 # Add more as needed for your degen analytics
 \`\`\`
 
-## 🎨 Features
+## Issues
+- Vercel's ai sdk only seems to output structured output will tools on gpt-4o
+- Verbosity of some tool calls leading to quick rate limits
+- OpenSea's MCP does not do well with time queries, so queries are time independent
+- Getting majorly rate limited by OpenAi
 
-- **🎭 Degen Gradient Background** - Animated crypto vibes
-- **📊 On-Chain Analytics** - Real wallet data, no fake numbers
-- **🤖 AI-Powered Insights** - GPT roasts your trading skills
-- **📱 Mobile Responsive** - Flex on mobile too
-- **⚡ Fast AF** - Because time is money, literally
 
-## 🤝 Contributing
-
-Found a bug? Want to add more degen features? 
-
-1. Fork it
-2. Create your feature branch (`git checkout -b feature/more-degen`)
-3. Commit your changes (`git commit -m 'Add some degen feature'`)
-4. Push to the branch (`git push origin feature/more-degen`)
-5. Open a Pull Request
 
 ## 📜 License
 
 MIT License - Do whatever you want, just don't rug us.
-
-## ⚠️ Disclaimer
-
-This is not financial advice. We're all just degens trying to make it. DYOR. 
-
-**Remember:** Past performance does not guarantee future results. Your bags might go to zero. Diamond hands are not guaranteed to print. WAGMI is not a promise.
-
----
-
-**Built with 💎🙌 by the degen collective**
-
-*"In crypto we trust, in code we verify"*

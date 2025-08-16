@@ -1,0 +1,100 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+	"assist": {
+		"actions": {
+			"recommended": true,
+			"source": {
+				"organizeImports": "on",
+				"recommended": true,
+				"useSortedProperties": "on"
+			}
+		},
+		"enabled": true
+	},
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 120
+	},
+	"javascript": {
+		"formatter": {
+			"bracketSpacing": true,
+			"enabled": true,
+			"indentStyle": "tab",
+			"indentWidth": 2,
+			"quoteProperties": "asNeeded",
+			"quoteStyle": "single",
+			"semicolons": "asNeeded",
+			"trailingCommas": "es5"
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"a11y": {
+				"useKeyWithClickEvents": "off"
+			},
+			"complexity": {
+				"noExcessiveCognitiveComplexity": "error",
+				"noUselessFragments": "error",
+				"noUselessTernary": "error",
+				"noUselessUndefinedInitialization": "error",
+				"noVoid": "error",
+				"useSimplifiedLogicExpression": "error",
+				"useOptionalChain": {
+					"level": "error",
+					"fix": "safe"
+				}
+			},
+			"correctness": {
+				"noUndeclaredVariables": "error",
+				"noUnusedImports": {
+					"level": "error",
+					"fix": "safe"
+				},
+				"useExhaustiveDependencies": {
+					"level": "error",
+					"fix": "safe"
+				},
+				"noUnusedVariables": "error",
+				"useHookAtTopLevel": "error",
+				"useJsxKeyInIterable": "error"
+			},
+			"nursery": {
+				"recommended": true,
+				"useSortedClasses": "off"
+			},
+			"performance": {
+				"noAccumulatingSpread": "error",
+				"noBarrelFile": "error",
+				"noDelete": { "level": "error", "fix": "safe" },
+				"noReExportAll": "error",
+				"useTopLevelRegex": "error",
+				"noImgElement": "off"
+			},
+			"recommended": true,
+			"security": {},
+			"style": {
+				"noNegationElse": "error",
+				"useCollapsedElseIf": "error",
+				"useConsistentArrayType": "error",
+				"useForOf": "error",
+				"useTemplate": {
+					"level": "error",
+					"fix": "safe"
+				},
+				"useFragmentSyntax": "error",
+				"useShorthandAssign": "error"
+			},
+			"suspicious": {
+				"noDuplicateJsxProps": "error",
+				"noDuplicateObjectKeys": "error",
+				"noExtraNonNullAssertion": "error",
+				"noRedeclare": "error",
+				"noSuspiciousSemicolonInJsx": "error"
+			}
+		}
+	}
+}
