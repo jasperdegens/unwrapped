@@ -1,20 +1,20 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { Fredoka } from "next/font/google"
 import { Space_Mono } from "next/font/google"
-import { Orbitron } from "next/font/google"
 import "./globals.css"
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
 const spaceMono = Space_Mono({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-mono",
-  display: "swap",
-})
-
-const orbitron = Orbitron({
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  variable: "--font-sans",
   display: "swap",
 })
 
@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${orbitron.variable} ${spaceMono.variable} antialiased`}>
+    <html lang="en" className={`${fredoka.variable} ${spaceMono.variable} antialiased dark`}>
       <body>{children}</body>
     </html>
   )

@@ -8,7 +8,7 @@ import { DegenGradient } from "@/components/DegenGradient"
 
 const GENERATORS = [
   { id: "top-tokens", name: "Top Tokens", description: "Shows top 5 tokens by USD value", order: 10 },
-  { id: "top-nfts", name: "Top NFTs", description: "Gallery of top 4 NFTs by clout/value", order: 15 },
+  { id: "top-nfts", name: "Top NFTs", description: "Gallery of top 4 NFTs by value", order: 15 },
   { id: "best-trade", name: "Best Trade", description: "Highest positive PnL trade from last 365 days", order: 20 },
 ]
 
@@ -81,49 +81,49 @@ export default function TestPage() {
     <div className="min-h-screen relative">
       <DegenGradient />
       <div className="relative z-10 container mx-auto px-4 py-8">
-        <Card className="max-w-4xl mx-auto bg-black/20 backdrop-blur-sm border-orange-500/20">
+        <Card className="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border-slate-600">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center text-orange-400">🧪 Degen Card Test Lab</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center text-slate-100">Generator Test Lab</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Wallet Address to Test</label>
+              <label className="text-sm font-medium text-slate-300">Wallet Address to Test</label>
               <Input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="0x..."
-                className="bg-black/40 border-gray-600 text-white"
+                className="bg-slate-700/50 border-slate-600 text-slate-100"
               />
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-orange-300">🎯 Test All Generators</h3>
+              <h3 className="text-lg font-semibold text-slate-200">Test All Generators</h3>
               <Button
                 onClick={testGeneration}
                 disabled={loading || !address}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold"
+                className="w-full bg-slate-600 hover:bg-slate-500 text-slate-100 font-bold"
               >
-                {loading ? "🔄 Generating All Cards..." : "🚀 Test Full Generation"}
+                {loading ? "Generating All Cards..." : "Test Full Generation"}
               </Button>
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-orange-300">🎮 Test Individual Generators</h3>
+              <h3 className="text-lg font-semibold text-slate-200">Test Individual Generators</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {GENERATORS.map((gen) => (
-                  <Card key={gen.id} className="bg-black/30 border-gray-600">
+                  <Card key={gen.id} className="bg-slate-700/50 border-slate-600">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-white">{gen.name}</CardTitle>
+                      <CardTitle className="text-sm text-slate-100">{gen.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <p className="text-xs text-gray-400">{gen.description}</p>
+                      <p className="text-xs text-slate-400">{gen.description}</p>
                       <Button
                         onClick={() => testSingleGenerator(gen.id)}
                         disabled={testingGenerator === gen.id || !address}
                         size="sm"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        className="w-full bg-slate-600 hover:bg-slate-500 text-slate-100"
                       >
-                        {testingGenerator === gen.id ? "🔄 Testing..." : "🧪 Test"}
+                        {testingGenerator === gen.id ? "Testing..." : "Test"}
                       </Button>
                     </CardContent>
                   </Card>
@@ -133,15 +133,15 @@ export default function TestPage() {
 
             {error && (
               <div className="p-4 bg-red-900/50 border border-red-500/50 rounded-lg">
-                <p className="text-red-300 font-mono text-sm">❌ {error}</p>
+                <p className="text-red-300 font-mono text-sm">Error: {error}</p>
               </div>
             )}
 
             {result && (
               <div className="p-4 bg-green-900/50 border border-green-500/50 rounded-lg">
-                <p className="text-green-300 font-bold mb-2">✅ Test Successful!</p>
+                <p className="text-green-300 font-bold mb-2">Test Successful</p>
                 <div className="space-y-3">
-                  <div className="text-sm text-gray-300 space-y-1">
+                  <div className="text-sm text-slate-300 space-y-1">
                     {result.count !== undefined ? (
                       <>
                         <p>Cards Generated: {result.count}</p>
@@ -166,9 +166,9 @@ export default function TestPage() {
                       </>
                     )}
                   </div>
-                  <details className="bg-black/40 rounded p-3">
-                    <summary className="text-orange-300 cursor-pointer font-mono text-sm">📋 View JSON Output</summary>
-                    <pre className="mt-2 text-xs text-gray-300 overflow-auto max-h-96">
+                  <details className="bg-slate-700/50 rounded p-3">
+                    <summary className="text-slate-200 cursor-pointer font-mono text-sm">View JSON Output</summary>
+                    <pre className="mt-2 text-xs text-slate-300 overflow-auto max-h-96">
                       {JSON.stringify(result, null, 2)}
                     </pre>
                   </details>

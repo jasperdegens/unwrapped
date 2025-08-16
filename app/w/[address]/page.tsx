@@ -27,23 +27,21 @@ export default async function WrappedPage({ params }: { params: { address: strin
   }
 
   return (
-    <main className="min-h-screen text-neutral-200">
+    <main className="min-h-screen text-slate-200">
       <DegenGradient />
       <div className="mx-auto max-w-3xl px-6 py-16">
         {!deck ? (
           <div className="text-center">
-            <div className="text-neutral-400 mb-4">🔄 generating your degen wrapped...</div>
-            <div className="text-sm text-emerald-400">
-              this might take a few secs, anon. we're crunching the numbers 📊
-            </div>
+            <div className="text-slate-400 mb-4">Generating wallet analytics...</div>
+            <div className="text-sm text-slate-300">Processing transaction data and calculating metrics</div>
           </div>
         ) : (
           <>
             <header className="mb-6">
               <h1 className="text-2xl font-bold">
-                wrap for <span className="font-mono text-emerald-400">{params.address}</span>
+                Analytics for <span className="font-mono text-slate-300">{params.address}</span>
               </h1>
-              <p className="text-sm text-neutral-500">snapshot {new Date(deck.snapshotAt).toLocaleString()}</p>
+              <p className="text-sm text-slate-500">Generated {new Date(deck.snapshotAt).toLocaleString()}</p>
             </header>
 
             <div className="grid gap-6">
