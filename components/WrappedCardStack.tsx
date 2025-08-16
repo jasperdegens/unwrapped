@@ -17,8 +17,29 @@ export function WrappedCardStack({ cards, className = "" }: WrappedCardStackProp
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [dragRotation, setDragRotation] = useState(0)
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 })
   const cardRef = useRef<HTMLDivElement>(null)
   const startPos = useRef({ x: 0, y: 0 })
+
+  const handleCardMouseMove = (e: React.MouseEvent, cardElement: HTMLDivElement) => {
+    const rect = cardElement.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+
+    setMousePos({ x, y })
+
+    // Update CSS variables for holographic effects
+    cardElement.style.setProperty("--mx", `${x}%`)
+    cardElement.style.setProperty("--my", `${y}%`)
+    cardElement.style.setProperty("--posx", `${x}%`)
+    cardElement.style.setProperty("--posy", `${y}%`)
+
+    // Add subtle 3D rotation based on mouse position
+    const rotateX = (y - 50) * 0.1
+    const rotateY = (x - 50) * -0.1
+    cardElement.style.setProperty("--rx", `${rotateY}deg`)
+    cardElement.style.setProperty("--ry", `${rotateX}deg`)
+  }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true)
@@ -33,7 +54,7 @@ export function WrappedCardStack({ cards, className = "" }: WrappedCardStackProp
     const deltaY = e.clientY - startPos.current.y
 
     setDragOffset({ x: deltaX, y: deltaY })
-    setDragRotation(deltaX * 0.1) // Subtle rotation based on horizontal drag
+    setDragRotation(deltaX * 0.1)
   }
 
   const handleMouseUp = () => {
@@ -106,13 +127,20 @@ export function WrappedCardStack({ cards, className = "" }: WrappedCardStackProp
           const yOffset = index * 6
           const rotation = index * 1.5
 
+          const getRarity = (card: WrappedCard) => {
+            if (card.type === "best-trade") return "rainbow"
+            if (card.type === "account-metadata") return "gold"
+            return "holo"
+          }
+
           return (
             <div
               key={`${card.id}-${index}`}
               ref={isTopCard ? cardRef : null}
-              className={`absolute transition-all duration-300 ease-out ${
-                isTopCard ? "cursor-pointer" : "pointer-events-none"
+              className={`holo-card absolute transition-all duration-300 ease-out ${
+                isTopCard ? "cursor-pointer active" : "pointer-events-none"
               }`}
+              data-rarity={getRarity(card)}
               style={{
                 transform: isTopCard
                   ? `translateX(${dragOffset.x}px) translateY(${dragOffset.y + yOffset}px) scale(${scale}) rotate(${dragRotation}deg)`
@@ -120,13 +148,24 @@ export function WrappedCardStack({ cards, className = "" }: WrappedCardStackProp
                 zIndex,
               }}
               onMouseDown={isTopCard ? handleMouseDown : undefined}
-              onMouseMove={isTopCard ? handleMouseMove : undefined}
+              onMouseMove={
+                isTopCard
+                  ? (e) => {
+                      handleMouseMove(e)
+                      if (cardRef.current) {
+                        handleCardMouseMove(e, cardRef.current)
+                      }
+                    }
+                  : undefined
+              }
               onMouseUp={isTopCard ? handleMouseUp : undefined}
               onTouchStart={isTopCard ? handleTouchStart : undefined}
               onTouchMove={isTopCard ? handleTouchMove : undefined}
               onTouchEnd={isTopCard ? handleTouchEnd : undefined}
             >
-              <div className="w-96 h-[500px] overflow-hidden">
+              <div className="holo-card__rotator w-96 h-[500px] overflow-hidden">
+                <div className="holo-card__shine"></div>
+                <div className="holo-card__glare"></div>
                 <WrappedCardView card={card} />
               </div>
             </div>
