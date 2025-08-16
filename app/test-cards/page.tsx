@@ -1,7 +1,6 @@
 'use client'
-import { DegenGradient } from '@/components/DegenGradient'
 import { WrappedCardPresentation } from '@/components/WrappedCardPresentation'
-import type { WrappedCard } from '@/types/wrapped'
+import type { WrappedCard, WrappedCardCollection } from '@/types/wrapped'
 
 const mockCards: WrappedCard[] = [
 	{
@@ -96,21 +95,12 @@ const mockCards: WrappedCard[] = [
 	},
 ]
 
+const mockCollection: WrappedCardCollection = {
+	address: '0x1234567890abcdef1234567890abcdef12345678',
+	cards: mockCards,
+	timestamp: new Date().toISOString(),
+}
+
 export default function TestCardsPage() {
-	return (
-		<div className="min-h-screen relative overflow-hidden bg-slate-900">
-			<div className="absolute inset-0 backdrop-blur-sm bg-slate-800/10 z-0"></div>
-
-			<DegenGradient />
-
-			<div className="relative z-10 container mx-auto px-4 py-12">
-				<div className="text-center mb-8">
-					<h1 className="text-5xl font-black text-slate-100 mb-4 transform -rotate-1 drop-shadow-lg">Card Preview</h1>
-					<p className="text-slate-300 text-lg mb-4 font-medium">View the reveal sequence or browse cards</p>
-				</div>
-
-				<WrappedCardPresentation cards={mockCards} />
-			</div>
-		</div>
-	)
+	return <WrappedCardPresentation collection={mockCollection} />
 }

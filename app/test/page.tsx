@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { DegenGradient } from '@/components/DegenGradient'
+import { DegenBG } from '@/components/DegenGradient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -80,7 +80,7 @@ export default function TestPage() {
 
 	return (
 		<div className="min-h-screen relative">
-			<DegenGradient />
+			<DegenBG />
 			<div className="relative z-10 container mx-auto px-4 py-8">
 				<Card className="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-sm border-slate-600">
 					<CardHeader>
