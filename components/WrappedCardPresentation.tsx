@@ -16,7 +16,7 @@ interface WrappedCardPresentationProps {
 	className?: string
 }
 
-export function WrappedCardPresentation({ collection, className = '' }: WrappedCardPresentationProps) {
+export function WrappedCardPresentation({ collection: collectionProp, className = '' }: WrappedCardPresentationProps) {
 	const [phase, setPhase] = useState<'waiting' | 'intro1' | 'intro2' | 'ready' | 'reveal' | 'stack'>('waiting')
 	const [currentCardIndex, setCurrentCardIndex] = useState(0)
 	const [showingDetails, setShowingDetails] = useState(false)
@@ -24,8 +24,8 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 	const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 	const [fadeOut, setFadeOut] = useState(false)
 	const [shareLink, setShareLink] = useState('')
-	const { setCollection } = useWrappedCard()
-	const { cards, address } = collection
+	const { collection, setCollection } = useWrappedCard()
+	const { cards, address } = collectionProp || collection || {}
 	const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '0x...0000'
 
 	// Generate share URL
@@ -34,10 +34,10 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 	}, [address])
 
 	useEffect(() => {
-		if (collection) {
-			setCollection(collection)
+		if (collectionProp && !collection) {
+			setCollection(collectionProp)
 		}
-	}, [collection, setCollection])
+	}, [collectionProp, setCollection, collection])
 
 	const transitionToPhase = useCallback((nextPhase: string) => {
 		setFadeOut(true)
@@ -188,6 +188,12 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 								<Button type="button" variant="default" className="backdrop-blur-md border border-slate-600 text-white">
 									<PlusIcon className="w-4 h-4" />
 									Create a card
+								</Button>
+							</Link>
+							<Link href="hypergraph">
+								<Button type="button" variant="default" className="backdrop-blur-md border border-slate-600 text-white">
+									<PlusIcon className="w-4 h-4" />
+									Publish to Hypergraph
 								</Button>
 							</Link>
 						</div>

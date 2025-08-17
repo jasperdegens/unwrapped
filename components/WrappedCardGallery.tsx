@@ -59,7 +59,6 @@ export function WrappedCardGallery({ cards, className = '' }: WrappedCardGallery
 					style={{
 						scrollbarWidth: 'none',
 						msOverflowStyle: 'none',
-						'&::-webkit-scrollbar': { display: 'none' },
 					}}
 				>
 					{cards.map((card, index) => (

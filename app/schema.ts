@@ -11,11 +11,6 @@ export class WrappedCard extends Entity.Class<WrappedCard>('WrappedCard')({
   media: Type.String,
   revealText: Type.String,
   order: Type.Number,
-  createdAt: Type.String
-}) {}
-
-export class WrappedCardCollection extends Entity.Class<WrappedCardCollection>('WrappedCardCollection')({
-  address: Type.String,
-  cards: Type.Relation(WrappedCard),
-  timestamp: Type.String
+  createdAt: Type.String,
+  address: Type.String
 }) {}

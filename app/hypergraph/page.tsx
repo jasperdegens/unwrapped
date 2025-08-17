@@ -1,7 +1,7 @@
 'use client'
 import { useHypergraphAuth, useSpaces } from '@graphprotocol/hypergraph-react'
+import { redirect } from 'next/navigation'
 import { LoginPrompt } from './components/login-button'
-import { PrivateSpaceWrapper } from './PrivateSpace'
 
 export default function PrivateSpacePage() {
 	const { authenticated, identity } = useHypergraphAuth()
@@ -12,5 +12,12 @@ export default function PrivateSpacePage() {
 		return <LoginPrompt />
 	}
 
-	return <PrivateSpaceWrapper spaceid={data?.[0]?.id || process.env.NEXT_PUBLIC_HYPERGRAPH_SPACE_ID} />
+	if (isPending) {
+		return <div>Loading...</div>
+	}
+
+	redirect(`/hypergraph/${data?.[0]?.id}?mode=private`)
+
+	return <div>Loading...</div>
+	// return <PrivateSpaceWrapper spaceid={data?.[0]?.id || process.env.NEXT_PUBLIC_HYPERGRAPH_SPACE_ID} />
 }

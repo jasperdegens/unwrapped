@@ -3,29 +3,20 @@ import type { Mapping } from '@graphprotocol/hypergraph/mapping'
 
 export const mapping: Mapping = {
 	WrappedCard: {
-		typeIds: [Id('700f8216-30f8-4a20-a38b-0639f935cb34')],
+		typeIds: [Id('1fd566f2-bbe9-4183-9fa1-1bdc71be6d18')],
 		properties: {
-			description: Id('3bbf1131-bd00-4436-8612-796c7bf67591'),
-			name: Id('37c83566-1c92-417e-a2e0-f5eeecf45492'),
-			leadInText: Id('d9a6674e-8d4c-4c30-92ee-52dffbe6dafe'),
-			footnote: Id('e94715fc-8b19-45d1-b27b-c5e2ccad4836'),
-			updatedAt: Id('f982c677-4455-490f-ae21-276b8f890d31'),
-			kind: Id('a924ef70-6aae-4eaa-ab10-2e8c529a6e74'),
-			highlights: Id('2ae76312-2e2a-4a16-9c2b-25594f9c75b9'),
-			media: Id('997e210e-1aa7-4935-afe4-fd1026e9d222'),
-			revealText: Id('361404d1-d39d-4b00-8138-7c84ddf8814d'),
-			order: Id('b3827d2d-c814-41a3-9d36-0006f9d30bec'),
-			createdAt: Id('3e56887e-9b01-48c1-8f8b-23005d9932dc'),
-		},
-	},
-	WrappedCardCollection: {
-		typeIds: [Id('b52f5edc-cb88-472d-931d-e8bb0118c761')],
-		properties: {
-			address: Id('8ce2f2a2-62db-43c8-8cb2-90fa42f118ac'),
-			timestamp: Id('26a1c201-ee1a-4c01-85bb-7363ae757e6f'),
-		},
-		relations: {
-			cards: Id('23dca992-80df-4ac4-a412-f1f6d5270f35'),
+			description: Id('da934e16-e796-4b64-9387-361f9e860197'),
+			name: Id('7c5a5edf-fb55-4eae-adfc-e3d586d0f3f3'),
+			leadInText: Id('34454778-8f4e-4d78-9d12-51db4e8c3d60'),
+			footnote: Id('e7ed1a66-1398-4ec0-9278-994cda81aed0'),
+			updatedAt: Id('1e269275-6e84-486e-8694-6df05aa97a32'),
+			kind: Id('6414575c-1b48-49c1-bbf1-8e1b3b067b81'),
+			highlights: Id('7f1f5874-09e7-4201-a232-f88d6eeea498'),
+			media: Id('f08ce15b-76a6-416f-9ee0-6a7fbcc223f1'),
+			revealText: Id('97b702f1-81a4-431f-91a5-60e6008b58fa'),
+			order: Id('5f658bf4-d6d4-4d38-a04d-4bb233c41045'),
+			createdAt: Id('c11c566d-db11-4dfa-b191-dbacf4bda3b8'),
+			address: Id('29876806-b7b8-44c9-b04d-7907188ed7fd'),
 		},
 	},
 }
