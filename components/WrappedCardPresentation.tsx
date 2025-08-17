@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ShareModal } from '@/components/ShareModal'
 import { WrappedCardGallery } from '@/components/WrappedCardGallery'
 import { WrappedCardView } from '@/components/WrappedCardView'
+import { useWrappedCard } from '@/providers/wrapped-card-provider'
 import type { WrappedCardCollection } from '@/types/wrapped'
 import { Button } from './ui/button'
 import { GradientText } from './ui/shadcn-io/gradient-text'
@@ -23,6 +24,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 	const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 	const [fadeOut, setFadeOut] = useState(false)
 	const [shareLink, setShareLink] = useState('')
+	const { setCollection } = useWrappedCard()
 	const { cards, address } = collection
 	const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '0x...0000'
 
@@ -30,6 +32,12 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 	useEffect(() => {
 		setShareLink(`${window.location.origin}/share?address=${encodeURIComponent(address)}`)
 	}, [address])
+
+	useEffect(() => {
+		if (collection) {
+			setCollection(collection)
+		}
+	}, [collection, setCollection])
 
 	const transitionToPhase = useCallback((nextPhase: string) => {
 		setFadeOut(true)
