@@ -50,6 +50,18 @@ export async function setCollection(collection: WrappedCardCollection): Promise<
 	try {
 		const client = await getRedisClient()
 		const key = generateCollectionKey(collection.address)
+		// get existing collection and merge cards based on kind
+		const existingCollection = await getCollection(collection.address)
+		if (existingCollection) {
+			// merge cards based on kind
+			collection.cards = [...existingCollection.cards, ...collection.cards]
+		}
+
+		// remove duplicates based on kind
+		collection.cards = collection.cards.filter(
+			(card, index, self) => index === self.findIndex((t) => t.kind === card.kind)
+		)
+
 		await client.setEx(key, 86400, JSON.stringify(collection))
 	} catch (error) {
 		console.error('[Redis] Error setting collection:', error)

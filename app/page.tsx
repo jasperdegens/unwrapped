@@ -1,6 +1,7 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { LoadingComponent } from '@/components/LoadingComponent'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -8,7 +9,7 @@ import { GradientText } from '@/components/ui/shadcn-io/gradient-text'
 import { WrappedCardPresentation } from '@/components/WrappedCardPresentation'
 import { useWrappedCard } from '@/providers/wrapped-card-provider'
 
-const targetCardKeys = ['nft-entourage'] //['account-metadata', 'top-tokens']
+const targetCardKeys = ['account-metadata', 'top-traded', 'top-tokens', 'nft-entourage'] //'recommendations']
 
 // Generator display names for better UX
 const generatorDisplayNames: Record<string, string> = {
@@ -21,30 +22,11 @@ const generatorDisplayNames: Record<string, string> = {
 // Move regex to top level to avoid performance issues
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
 
-const loadingTexts = [
-	'Unwrapping all your degen trades...',
-	'Analyzing your wak NFTs...',
-	'Crunching those gas fees...',
-	'Decoding your smart contract calls...',
-	'Calculating your diamond hands score...',
-	'Mapping your DeFi journey...',
-	'Processing your bridge transactions...',
-	'Analyzing your trading patterns...',
-	'Checking your ENS game...',
-	'Measuring your protocol interactions...',
-	'Counting your smart contract deploys...',
-	'Evaluating your bridge nomad status...',
-	'Assessing your DeFi degen level...',
-	'Calculating your swap frequency...',
-	'Measuring your power user score...',
-]
-
 export default function Home() {
 	const [address, setAddress] = useState('')
 	const [error, setError] = useState<string | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [loadingProgress, setLoadingProgress] = useState(0)
-	const [currentLoadingText, setCurrentLoadingText] = useState(0)
 	const [generatedCards, setGeneratedCards] = useState<any[]>([])
 	const [failedGenerators, setFailedGenerators] = useState<string[]>([])
 	const [currentGenerator, setCurrentGenerator] = useState<string>('')
@@ -67,17 +49,6 @@ export default function Home() {
 			setError('Invalid wallet address format. Please enter a valid 0x address.')
 		}
 	}, [searchParams])
-
-	// Cycle through loading texts
-	useEffect(() => {
-		if (!isLoading) return
-
-		const interval = setInterval(() => {
-			setCurrentLoadingText((prev) => (prev + 1) % loadingTexts.length)
-		}, 2500)
-
-		return () => clearInterval(interval)
-	}, [isLoading])
 
 	const generateCards = async (walletAddress: string) => {
 		setIsLoading(true)
@@ -219,79 +190,16 @@ export default function Home() {
 				)}
 
 				{isLoading ? (
-					<div className="mt-8 space-y-6">
-						{/* Loading Text */}
-						<div className="text-center">
-							<p className="text-xl text-slate-300 font-mono animate-pulse">{loadingTexts[currentLoadingText]}</p>
-						</div>
-
-						{/* Progress Bar */}
-						<div className="w-full bg-slate-700/50 rounded-full h-3 border border-slate-600 overflow-hidden">
-							<div
-								className="h-full bg-gradient-to-r from-cyan-400 via-purple-400 to-green-400 rounded-full transition-all duration-500 ease-out relative"
-								style={{ width: `${loadingProgress}%` }}
-							>
-								{/* Animated shimmer effect */}
-								<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
-							</div>
-						</div>
-
-						{/* Progress Text */}
-						<div className="text-center">
-							<p className="text-sm text-slate-400 font-mono">{Math.round(loadingProgress)}% Complete</p>
-							<p className="text-xs text-slate-500 font-mono mt-1">
-								Generated {generatedCards.length} of {targetCardKeys.length} cards
-							</p>
-							{currentGenerator && (
-								<p className="text-xs text-slate-400 font-mono mt-2">
-									Currently processing: {generatorDisplayNames[currentGenerator] || currentGenerator}
-								</p>
-							)}
-						</div>
-
-						{/* Generator Status */}
-						<div className="space-y-2">
-							{targetCardKeys.map((generatorId) => {
-								const status = generatorProgress[generatorId] || 'pending'
-								const statusColor = {
-									pending: 'text-slate-500',
-									processing: 'text-cyan-400',
-									completed: 'text-green-400',
-									failed: 'text-red-400',
-								}[status]
-
-								const statusIcon = {
-									pending: '⏳',
-									processing: '🔄',
-									completed: '✅',
-									failed: '❌',
-								}[status]
-
-								// Add spinning animation for processing state
-								const iconClass = status === 'processing' ? 'animate-spin' : ''
-
-								return (
-									<div key={generatorId} className="flex items-center justify-between text-xs">
-										<span className="text-slate-400 font-mono">
-											{generatorDisplayNames[generatorId] || generatorId}
-										</span>
-										<span className={`font-mono ${statusColor}`}>
-											<span className={iconClass}>{statusIcon}</span> {status}
-										</span>
-									</div>
-								)
-							})}
-						</div>
-
-						{/* Failed Generators */}
-						{failedGenerators.length > 0 && (
-							<div className="text-center">
-								<p className="text-xs text-slate-500 font-mono">
-									Some generators failed: {failedGenerators.join(', ')}
-								</p>
-							</div>
-						)}
-					</div>
+					<LoadingComponent
+						isLoading={isLoading}
+						loadingProgress={loadingProgress}
+						generatedCards={generatedCards}
+						targetCardKeys={targetCardKeys}
+						generatorProgress={generatorProgress}
+						currentGenerator={currentGenerator}
+						failedGenerators={failedGenerators}
+						generatorDisplayNames={generatorDisplayNames}
+					/>
 				) : (
 					<Card className="mt-8 border-none w-full p-0">
 						<CardContent className="py-6 px-0">

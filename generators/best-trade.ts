@@ -4,13 +4,6 @@ export const BestTradeGen: WrappedCardGeneratorSpec = {
 	kind: 'best-trade',
 	version: 1,
 	order: 20,
-	requires: ['txs', 'prices'],
-	tools: [
-		'opensea.wallet.transfers',
-		'opensea.wallet.nft_activity',
-		'opensea.token.prices_history',
-		'opensea.nft.metadata',
-	],
 	dataPrompt: `
 From the last 365 days, pick the single trade with the highest positive PnL (approx).
 Return STRICT JSON:

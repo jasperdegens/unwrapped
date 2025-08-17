@@ -1,73 +1,52 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { AccountMetadataGen } from '@/generators/account-metadata'
-import { BestTradeGen } from '@/generators/best-trade'
-import { NFTEntourageGen } from '@/generators/nft-entourage'
-import { TopTokensGen } from '@/generators/top-tokens'
 import { buildWrappedCard } from '@/lib/builder'
 import { deps } from '@/lib/deps'
-import { getCollection, setCardInCollection } from '@/lib/redis'
+import { setCardInCollection } from '@/lib/redis'
 import { nowIso } from '@/lib/util'
 import type { WrappedCardGeneratorSpec } from '@/types/generator'
 
 // Move regex to top level to avoid performance issues
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
 
-const generatorMap = {
-	'top-tokens': TopTokensGen,
-	'best-trade': BestTradeGen,
-	'nft-entourage': NFTEntourageGen,
-	'account-metadata': AccountMetadataGen,
-}
-
 export async function POST(req: NextRequest) {
 	try {
-		const { dataPrompt, mediaPrompt, address } = (await req.json()) as WrappedCardGeneratorSpec & { address: string }
+		const { dataPrompt, mediaPrompt, address, generatorName } = (await req.json()) as WrappedCardGeneratorSpec & {
+			address: string
+			generatorName: string
+		}
 
 		if (!ADDRESS_REGEX.test(address ?? '')) {
 			console.log('[v0] Invalid address format:', address)
 			return NextResponse.json({ error: 'invalid address format' }, { status: 400 })
 		}
 
-		const generator = generatorMap[generatorId as keyof typeof generatorMap]
-		if (!generator) {
-			console.log('[v0] Unknown generator:', generatorId)
-			return NextResponse.json({ error: `unknown generator: ${generatorId}` }, { status: 400 })
+		// Create a custom generator spec
+		const customGenerator: WrappedCardGeneratorSpec = {
+			kind: generatorName || 'custom',
+			version: 1,
+			order: 999, // High order to show last
+			dataPrompt: dataPrompt || '',
+			mediaPrompt: mediaPrompt || '',
 		}
 
 		const addrLower = address.toLowerCase()
 
-		// Check Redis cache first if available
-		const cachedCollection = await getCollection(addrLower)
-		// check for card to see if it exists
-		const cachedCard = cachedCollection?.cards.find((c) => c.kind === generator.kind)
-		if (cachedCard) {
-			console.log(`[v0] Returning cached card for ${generatorId}:${addrLower}`)
-			return NextResponse.json({
-				success: true,
-				generatorId,
-				address: addrLower,
-				card: cachedCard,
-				timestamp: new Date().toISOString(),
-				cached: true,
-			})
-		}
-
 		const snapshotAt = nowIso()
-		console.log(`[v0] Generating new card for ${generatorId}:${addrLower}`)
+		console.log(`[v0] Generating new custom card for ${generatorName}:${addrLower}`)
 
-		const card = await buildWrappedCard(deps, generator, { address: addrLower as `0x${string}`, snapshotAt })
-		console.log('[v0] Card generated:', card)
+		const card = await buildWrappedCard(deps, customGenerator, { address: addrLower as `0x${string}`, snapshotAt })
+		console.log('[v0] Custom card generated:', card)
 
 		if (card) {
 			// Store the generated card in Redis if available
 			await setCardInCollection(address, card)
 		}
 
-		console.log(`[v0] Generator ${generatorId} completed successfully`)
+		console.log(`[v0] Custom generator ${generatorName} completed successfully`)
 
 		return NextResponse.json({
 			success: true,
-			generatorId,
+			generatorName,
 			address: addrLower,
 			card,
 			timestamp: snapshotAt,

@@ -2,7 +2,9 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { AccountMetadataGen } from '@/generators/account-metadata'
 import { BestTradeGen } from '@/generators/best-trade'
 import { NFTEntourageGen } from '@/generators/nft-entourage'
+import { RecommendationsGen } from '@/generators/nft-recommendations'
 import { TopTokensGen } from '@/generators/top-tokens'
+import { TopTradedGen } from '@/generators/top-traded'
 import { buildWrappedCard } from '@/lib/builder'
 import { deps } from '@/lib/deps'
 import { getCollection, setCardInCollection } from '@/lib/redis'
@@ -18,6 +20,8 @@ const generatorMap = {
 	'best-trade': BestTradeGen,
 	'nft-entourage': NFTEntourageGen,
 	'account-metadata': AccountMetadataGen,
+	recommendations: RecommendationsGen,
+	'top-traded': TopTradedGen,
 }
 
 export async function POST(req: NextRequest) {

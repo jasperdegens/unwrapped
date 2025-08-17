@@ -177,12 +177,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 								Share your unwrapped
 							</Button>
 							<Link href="/create">
-								<Button
-									type="button"
-									variant="default"
-									onClick={() => setIsShareModalOpen(true)}
-									className="backdrop-blur-md border border-slate-600 text-white"
-								>
+								<Button type="button" variant="default" className="backdrop-blur-md border border-slate-600 text-white">
 									<PlusIcon className="w-4 h-4" />
 									Create a card
 								</Button>
