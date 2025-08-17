@@ -1,19 +1,18 @@
 import { redirect } from 'next/navigation'
 import { WrappedCardPresentation } from '@/components/WrappedCardPresentation'
 import { getCard } from '@/lib/redis'
-import type { WrappedCard } from '@/types/wrapped'
 
 // Move regex to top level to avoid performance issues
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
 
 interface SharePageProps {
-	searchParams: { address?: string }
+	searchParams: Promise<{ address?: string }>
 }
 
 const targetCardKeys = ['account-metadata']
 
 export default async function SharePage({ searchParams }: SharePageProps) {
-	const { address } = searchParams
+	const { address } = await searchParams
 
 	if (!address) {
 		redirect('/')
@@ -33,12 +32,13 @@ export default async function SharePage({ searchParams }: SharePageProps) {
 			})
 		)
 
-		if (cards.every((card) => card !== null)) {
+		if (cards.some((card) => card !== null)) {
 			return (
 				<WrappedCardPresentation
 					collection={{
 						address: address as `0x${string}`,
-						cards: cards.filter((card) => card !== null) as WrappedCard[],
+						cards: [cards[0], cards[0], cards[0], cards[0]],
+						//cards.filter((card) => card !== null) as WrappedCard[],
 						timestamp: new Date().toISOString(),
 					}}
 				/>

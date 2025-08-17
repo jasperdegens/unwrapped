@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ShareModal } from '@/components/ShareModal'
 import { WrappedCardGallery } from '@/components/WrappedCardGallery'
 import { WrappedCardView } from '@/components/WrappedCardView'
@@ -23,7 +23,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 	const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '0x...0000'
 
 	// Generate share URL
-	const shareUrl = `${window.location.origin}/share?address=${encodeURIComponent(address)}`
+	const shareUrl = useMemo(() => `${window.location.origin}/share?address=${encodeURIComponent(address)}`, [address])
 
 	const transitionToPhase = useCallback((nextPhase: string) => {
 		setFadeOut(true)
@@ -112,6 +112,12 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 			if (isTransitioning) return // Prevent interaction during transitions
 
 			const key = event.key
+
+			// Handle skip to stack phase
+			if (key === 's' || key === 'S') {
+				setPhase('stack')
+				return
+			}
 
 			// Handle intro phases
 			if ((phase === 'intro1' || phase === 'intro2') && (key === 'ArrowRight' || key === 'Enter' || key === ' ')) {

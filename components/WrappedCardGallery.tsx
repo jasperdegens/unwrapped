@@ -51,22 +51,22 @@ export function WrappedCardGallery({ cards, className = '' }: WrappedCardGallery
 
 	return (
 		<div className={`${className} w-full pt-8`}>
-			<div className="relative w-full max-w-7xl mx-auto">
+			<div className="relative w-full mx-auto">
 				<div
 					ref={scrollRef}
 					onScroll={handleScroll}
-					className="flex gap-6 overflow-x-auto pb-6 px-8 scroll-smooth"
+					className="flex gap-12 overflow-x-auto py-20 px-20 sm:px-40 scroll-smooth"
 					style={{
 						scrollbarWidth: 'none',
 						msOverflowStyle: 'none',
-						WebkitScrollbar: { display: 'none' },
+						'&::-webkit-scrollbar': { display: 'none' },
 					}}
 				>
 					{cards.map((card, index) => (
 						<div
 							key={index}
-							className={`flex-shrink-0 w-80 transition-all duration-300 ${
-								index === currentIndex ? 'scale-105' : 'scale-95 opacity-60'
+							className={`flex-shrink-0 transition-all duration-300 ${
+								index === currentIndex ? 'scale-100' : 'scale-95'
 							}`}
 						>
 							<div className="card-holographic w-full h-full">
