@@ -263,10 +263,10 @@ export function WrappedCardView({ card }: { card: WrappedCard }) {
 									{card.highlights.map((highlight, index) => (
 										<li
 											key={`${highlight.label}-${highlight.value}-${index}`}
-											className="rounded-lg border border-cyan-400/10 bg-gradient-to-br from-cyan-400/3 to-magenta-400/3 p-4 flex items-center justify-between group/item hover:border-cyan-400/25 hover:bg-gradient-to-br hover:from-cyan-400/8 hover:to-magenta-400/8 transition-all duration-300"
+											className="rounded-lg border border-cyan-400/10 bg-gradient-to-br from-cyan-400/3 to-magenta-400/3 p-4 flex items-center justify-between group/item hover:border-cyan-400/25 hover:bg-gradient-to-br hover:from-cyan-400/8 hover:to-magenta-400/8 transition-all duration-300 gap-2"
 										>
 											<span className="text-sm text-cyan-300/80 font-mono">{highlight.label}</span>
-											<span className="font-bold text-cyan-100/90 font-mono">{highlight.value}</span>
+											<span className="font-bold text-cyan-100/90 font-mono font-sm wordwrap">{highlight.value}</span>
 											{/* Subtle hover glow effect */}
 											<div className="absolute inset-0 -z-10 bg-gradient-to-r from-cyan-400/5 to-magenta-400/5 rounded-lg opacity-0 group-hover/item:opacity-100 transition-opacity duration-300" />
 										</li>

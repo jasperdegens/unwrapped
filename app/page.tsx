@@ -158,7 +158,7 @@ export default function Home() {
 	}
 
 	// If we have generated cards, show the presentation
-	if (generatedCards.length > 0) {
+	if (generatedCards.length > 0 && !isLoading) {
 		const collection = {
 			address: address as `0x${string}`,
 			cards: generatedCards,
@@ -178,9 +178,9 @@ export default function Home() {
 				/>
 
 				<p className="mt-3 text-slate-300 text-lg font-mono">
-					Enter your wallet address to view analytics.
+					Drop your addy, get your on-chain wrapped.
 					<br />
-					<span className="text-slate-200">Portfolio insights and transaction history</span>
+					<span className="text-slate-200">No cap.</span>
 				</p>
 
 				{error && (
