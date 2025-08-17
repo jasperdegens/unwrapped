@@ -50,7 +50,7 @@ export function WrappedCardGallery({ cards, className = '' }: WrappedCardGallery
 	}, [currentIndex, cards.length, scrollToCard])
 
 	return (
-		<div className={`${className} w-full pt-8`}>
+		<div className={`${className} w-full`}>
 			<div className="relative w-full mx-auto">
 				<div
 					ref={scrollRef}

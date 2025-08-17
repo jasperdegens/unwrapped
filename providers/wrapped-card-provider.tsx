@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
+import { setCollection as setCollectionRedis } from '@/lib/redis'
 import type { WrappedCard, WrappedCardCollection } from '@/types/wrapped'
 
 // State interface for the provider
@@ -134,6 +135,9 @@ export function WrappedCardProvider({ children }: WrappedCardProviderProps) {
 
 	// Actions
 	const setCollection = useCallback((collection: WrappedCardCollection | null) => {
+		if (collection) {
+			setCollectionRedis(collection)
+		}
 		dispatch({ type: 'SET_COLLECTION', payload: collection })
 	}, [])
 

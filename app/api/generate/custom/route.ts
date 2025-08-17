@@ -7,8 +7,7 @@ import { buildWrappedCard } from '@/lib/builder'
 import { deps } from '@/lib/deps'
 import { getCollection, setCardInCollection } from '@/lib/redis'
 import { nowIso } from '@/lib/util'
-
-export const runtime = 'nodejs'
+import type { WrappedCardGeneratorSpec } from '@/types/generator'
 
 // Move regex to top level to avoid performance issues
 const ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/
@@ -22,11 +21,7 @@ const generatorMap = {
 
 export async function POST(req: NextRequest) {
 	try {
-		const { address, generatorId } = await req.json()
-		console.log('[v0] Single generator test request:', {
-			address,
-			generatorId,
-		})
+		const { dataPrompt, mediaPrompt, address } = (await req.json()) as WrappedCardGeneratorSpec & { address: string }
 
 		if (!ADDRESS_REGEX.test(address ?? '')) {
 			console.log('[v0] Invalid address format:', address)

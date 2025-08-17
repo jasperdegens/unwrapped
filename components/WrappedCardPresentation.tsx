@@ -1,11 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { PlusIcon, ShareIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
 import { ShareModal } from '@/components/ShareModal'
 import { WrappedCardGallery } from '@/components/WrappedCardGallery'
 import { WrappedCardView } from '@/components/WrappedCardView'
 import type { WrappedCardCollection } from '@/types/wrapped'
 import { Button } from './ui/button'
+import { GradientText } from './ui/shadcn-io/gradient-text'
 
 interface WrappedCardPresentationProps {
 	collection: WrappedCardCollection
@@ -19,11 +22,14 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 	const [isTransitioning, setIsTransitioning] = useState(false)
 	const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 	const [fadeOut, setFadeOut] = useState(false)
+	const [shareLink, setShareLink] = useState('')
 	const { cards, address } = collection
 	const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '0x...0000'
 
 	// Generate share URL
-	const shareUrl = useMemo(() => `${window.location.origin}/share?address=${encodeURIComponent(address)}`, [address])
+	useEffect(() => {
+		setShareLink(`${window.location.origin}/share?address=${encodeURIComponent(address)}`)
+	}, [address])
 
 	const transitionToPhase = useCallback((nextPhase: string) => {
 		setFadeOut(true)
@@ -155,15 +161,38 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 			<>
 				<div className={className}>
 					<div className="w-full pt-8 pb-4 text-center">
-						<h1 className="text-3xl font-bold text-white mb-6">{truncatedAddress} Unwrapped</h1>
-						<Button type="button" variant="primary" onClick={() => setIsShareModalOpen(true)}>
-							Share Your Wrapped
-						</Button>
+						<GradientText
+							className="text-3xl font-bold mb-6 block"
+							gradient="linear-gradient(90deg, #22d3ee 0%, #a78bfa 50%, #4ade80 100%)"
+							text={`${truncatedAddress} Unwrapped`}
+						/>
+						<div className="flex items-center flex-row justify-center gap-4">
+							<Button
+								type="button"
+								variant="default"
+								onClick={() => setIsShareModalOpen(true)}
+								className="backdrop-blur-md border border-slate-600 text-white"
+							>
+								<ShareIcon className="w-4 h-4" />
+								Share your unwrapped
+							</Button>
+							<Link href="/create">
+								<Button
+									type="button"
+									variant="default"
+									onClick={() => setIsShareModalOpen(true)}
+									className="backdrop-blur-md border border-slate-600 text-white"
+								>
+									<PlusIcon className="w-4 h-4" />
+									Create a card
+								</Button>
+							</Link>
+						</div>
 					</div>
 					<WrappedCardGallery cards={cards} />
 				</div>
 
-				<ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} shareUrl={shareUrl} />
+				<ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} shareUrl={shareLink} />
 			</>
 		)
 	}
@@ -178,7 +207,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 
 	return (
 		<div className={`${className} min-h-screen flex items-center justify-center`}>
-			<div className="relative w-96 h-[500px] flex items-center justify-center">
+			<div className="relative w-[448px] flex items-center justify-center">
 				{/* Waiting phase - no text */}
 				<div
 					className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${
@@ -195,9 +224,11 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 					}`}
 				>
 					<div className="text-center">
-						<h2 className="text-4xl font-bold text-white mb-4 transition-all duration-[1500ms] ease-in-out">
-							Hello {truncatedAddress}
-						</h2>
+						<GradientText
+							className="text-5xl font-bold mb-4 transition-all duration-[1500ms] ease-in-out "
+							gradient={'linear-gradient(90deg, #22d3ee 0%, #a78bfa 50%, #4ade80 100%)'}
+							text={`Hello ${truncatedAddress}`}
+						/>
 						<p className="text-xl text-white/80 transition-all duration-[1500ms] ease-in-out delay-100">
 							You've had quite the year...
 						</p>
@@ -211,11 +242,13 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 					}`}
 				>
 					<div className="text-center">
-						<h2 className="text-4xl font-bold text-white mb-4 transition-all duration-[1500ms] ease-in-out">
-							Let's dive into
-						</h2>
+						<GradientText
+							className="text-5xl font-bold mb-4 transition-all duration-[1500ms] ease-in-out "
+							gradient={'linear-gradient(90deg, #22d3ee 0%, #a78bfa 50%, #4ade80 100%)'}
+							text="Let's dive into"
+						/>
 						<p className="text-xl text-white/80 transition-all duration-[1500ms] ease-in-out delay-100">
-							Your biggest wins and biggest Ls
+							Your biggest wins and hardest blows
 						</p>
 					</div>
 				</div>
@@ -227,9 +260,13 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 					}`}
 				>
 					<div className="text-center">
-						<h2 className="text-4xl font-bold text-white transition-all duration-[1500ms] ease-in-out">Ready to go?</h2>
+						<GradientText
+							className="text-5xl font-bold mb-4 transition-all duration-[1500ms] ease-in-out "
+							gradient={'linear-gradient(90deg, #22d3ee 0%, #a78bfa 50%, #4ade80 100%)'}
+							text="Ready to go?"
+						/>
 						<p className="text-xl text-white/80 transition-all duration-[1500ms] ease-in-out delay-100">
-							Click SPACE to continue
+							Press SPACE to continue
 						</p>
 					</div>
 				</div>
@@ -241,7 +278,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 					}`}
 				>
 					<div className="text-center">
-						<h2 className="text-4xl font-bold text-white transition-all duration-[1500ms] ease-in-out">
+						<h2 className="text-4xl font-bold transition-all duration-[1500ms] ease-in-out crypto-heading">
 							{currentCard.leadInText}
 						</h2>
 					</div>
@@ -254,7 +291,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 					}`}
 				>
 					{isCardDetails && (
-						<div className="w-full h-full">
+						<div className="w-full min-h-[800px] transform -translate-y-1/2" onClick={handleNext}>
 							<WrappedCardView card={currentCard} />
 						</div>
 					)}
@@ -267,7 +304,7 @@ export function WrappedCardPresentation({ collection, className = '' }: WrappedC
 				</div>
 			) : showingDetails ? (
 				<div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-					<p className="text-white/60 text-sm transition-all duration-500 ease-in-out">→ or ESC</p>
+					<p className="text-white/60 text-sm transition-all duration-500 ease-in-out">→ for next, S to skip</p>
 				</div>
 			) : null}
 		</div>

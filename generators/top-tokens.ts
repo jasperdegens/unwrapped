@@ -1,7 +1,7 @@
 import type { WrappedCardGeneratorSpec } from '@/types/generator'
 
 export const TopTokensGen: WrappedCardGeneratorSpec = {
-	kind: 'top_tokens',
+	kind: 'top-tokens',
 	version: 1,
 	order: 10,
 	requires: ['tokens', 'prices'],
@@ -48,10 +48,7 @@ FALLBACKS
   revealText: "Tiny stack today — tomorrow we send."  
   footnote: "Based on current token balances; NFTs not included."
 `,
-	//   mediaPrompt: `
-	// Craft an SVG (1200x630) horizontal bar chart from "highlights".
-	// Bars labeled by "label", width ∝ USD (parsed from "value"). Return:
-	// { "kind":"svg", "svg":"<svg>...</svg>" }.
-	// Use bold, neon gradient vibes.
-	// `,
+	mediaPrompt: `
+	You are to generate a creative SVG that tries to capture the key highlights of the account. Include 100 shapes. Have the color scheme match the persona. Try to make decals and shapes that represent the persona of this account.
+	`,
 }

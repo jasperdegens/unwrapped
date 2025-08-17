@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const UnifiedCardDataSchema = z.object({
 	leadInText: z.string().min(1),
 	revealText: z.string().min(1),
-	highlights: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
+	highlights: z.array(z.object({ label: z.string(), value: z.string(), image: z.string().optional() })).optional(),
 	footnote: z.string().optional(),
 })
 

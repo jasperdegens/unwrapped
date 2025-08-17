@@ -12,6 +12,7 @@ TOOL USE (MCP)
 - Minimize calls. Prefer a ~365-day window unless instructed otherwise.
 - Try and use a maximum of 10 tool calls.
 - Prioritize the OpenSea tools when fetching wallet data.
+- For all tools with limit parameters, set the max limit to 20.
 
 OUTPUT CONTRACT (STRICT)
 - Return EXACTLY one JSON object matching UnifiedCardData:

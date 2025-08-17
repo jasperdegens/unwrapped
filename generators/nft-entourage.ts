@@ -1,46 +1,48 @@
 import fs from 'node:fs'
-import { toFile } from 'openai'
+import OpenAI, { toFile } from 'openai'
 import sharp from 'sharp'
+import { MEDIA_SYSTEM_PROMPT } from '@/lib/prompts'
+import { MediaSchema } from '@/schemas/unified'
 import type { WrappedCardGeneratorSpec } from '@/types/generator'
 
 // Safer fetch -> validate -> normalize to PNG
 async function fetchAndNormalizeToPng(url: string, name: string) {
-	const res = await fetch(url, {
-		headers: { Accept: 'image/*' }, // helps some CDNs pick a sane format
-	})
+	try {
+		const res = await fetch(url, {
+			headers: { Accept: 'image/*' }, // helps some CDNs pick a sane format
+		})
 
-	if (!res.ok) {
-		throw new Error(`Failed to fetch ${url}: HTTP ${res.status}`)
+		if (!res.ok) {
+			console.warn(`Failed to fetch ${url}: HTTP ${res.status}`)
+			return null
+		}
+
+		const ct = res.headers.get('content-type') || ''
+		if (!ct.startsWith('image/')) {
+			// You might be getting HTML from the CDN (e.g., 403/hotlink block)
+			const text = await res.text()
+			console.warn(`Non-image payload from ${url}: content-type=${ct}, sample="${text.slice(0, 120)}..."`)
+			return null
+		}
+
+		// Read bytes and normalize to a vanilla PNG (RGB, sRGB), limit size sensibly
+		const buf = Buffer.from(await res.arrayBuffer())
+		const png = await sharp(buf)
+			.rotate() // respect EXIF orientation
+			.png({ compressionLevel: 9 }) // standard, non-animated PNG
+			.toBuffer()
+
+		console.log(png)
+
+		// Return a File-like object with the correct content-type
+		return await toFile(new Blob([png], { type: 'image/png' }), `${name}.png`, {
+			type: 'image/png',
+		})
+	} catch (error) {
+		console.warn(`Error processing image ${url}:`, error)
+		return null
 	}
-
-	const ct = res.headers.get('content-type') || ''
-	if (!ct.startsWith('image/')) {
-		// You might be getting HTML from the CDN (e.g., 403/hotlink block)
-		const text = await res.text()
-		throw new Error(`Non-image payload from ${url}: content-type=${ct}, sample="${text.slice(0, 120)}..."`)
-	}
-
-	// Read bytes and normalize to a vanilla PNG (RGB, sRGB), limit size sensibly
-	const buf = Buffer.from(await res.arrayBuffer())
-	const png = await sharp(buf)
-		.rotate() // respect EXIF orientation
-		.png({ compressionLevel: 9 }) // standard, non-animated PNG
-		.toBuffer()
-
-	console.log(png)
-
-	// Return a File-like object with the correct content-type
-	return await toFile(new Blob([png], { type: 'image/png' }), `${name}.png`, {
-		type: 'image/png',
-	})
 }
-
-const baseMediaPrompt = `
-Retrieve the traits and imageUrl of each of the NFTs provided. They should be returned in a valid JSON object, in the format of:
-[
-  { imageUrl: string, traits: [{trait_type: string, value: any}]}
-]
-`
 
 const imagePrompt = `
 Create a cinematic scene called **“NFT Entourage.”**
@@ -72,20 +74,18 @@ OUTPUT
 `
 
 export const NFTEntourageGen: WrappedCardGeneratorSpec = {
-	kind: 'nft_entourage',
+	kind: 'nft-entourage',
 	version: 1,
 	order: 15,
 	requires: ['nfts'],
-	tools: ['opensea.wallet.nfts', 'opensea.nft.metadata'],
 	dataPrompt: `
-1) Find the wallet’s **top 4 most valuable NFTs** (current value). Prefer:
-   - item’s last sale price (if recent & reliable), else
-   - collection floor price for that token’s collection, else
-   - highest bid / suggested value if available.
+1) get the profile for this account, which includes the latest trades. Find the 4 trades for tokens this user currently owns that are worth the most.
 2) For each of the 4, get:
    - collection name, token id, and a **key trait** (the most notable/rare or signature trait),
 3) Write a **fun, crypto-native description** of this “entourage” in degen slang (short & punchy).
 4) List the NFTs as the highlights, and include their NFT token names exactly as they appear.
+5) Include the collection name as the highlight label. Include the token name as the highlight value.
+6) You MUST include the urls for the images of the NFTs in the highlights.
 
 - If fewer than 4 NFTs are owned, use as many as available (down to 1).
 
@@ -97,73 +97,113 @@ The leadInText should be something like, "Your NFT entourage is...
 	// { "kind":"svg", "svg":"<svg>...</svg>", "alt":"Top NFTs showcase" }.
 	// Include placeholder rectangles with gradient fills and "NFT" labels.
 	// `,
-	async mediaProcessor({ ai, data, openai, vars }) {
-		// const tokens = data.highlights
-		// if (!tokens) {
-		// 	return undefined
-		// }
+	async mediaProcessor({ ai, data, vars }) {
+		const tokens = data.highlights
+		if (!tokens) {
+			return ai.callStructuredJSON({
+				system: MEDIA_SYSTEM_PROMPT,
+				prompt: 'Generate an SVG representaiton of the NFTs in the highlights.',
+				schema: MediaSchema,
+			})
+		}
 
-		// const prompt = `${baseMediaPrompt}\n\nNFTs:\n
-		// ${tokens.map((token) => `${token.label}`).join('\n')}
-		// `
-		// const nftMetadata = await ai.callStructuredJSON({
-		// 	system: '',
-		// 	prompt: prompt,
-		// 	schema: nftMetadataSchema,
-		// })
+		const prompt = `${imagePrompt}\n\nNFTs:\n
+		${JSON.stringify(tokens, null, 2)}
+		`
 
-		// log the urls
-		// console.log(nftMetadata)
-
-		const images = [
-			'https://i2.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/af1144d4fcc4877459f536624a8e78/baaf1144d4fcc4877459f536624a8e78.jpeg',
-			'https://i2.seadn.io/ethereum/0xd79e4cc964e5a2c1e400fe5a8488c71d9fd9847e/a9c43d0d35630b70d25a206c5fa23c/dfa9c43d0d35630b70d25a206c5fa23c.jpeg',
-			'https://i2.seadn.io/ethereum/0xd79e4cc964e5a2c1e400fe5a8488c71d9fd9847e/79c6811e432302ba25b7abd3e28aca/f979c6811e432302ba25b7abd3e28aca.jpeg',
-			'https://i2.seadn.io/ethereum/0xa3aee8bce55beea1951ef834b99f3ac60d1abeeb/86b8b568bbb2c19d8c0d3a5548b800/2186b8b568bbb2c19d8c0d3a5548b800.png',
-		]
+		const images = tokens.map((token) => token.image).filter((image) => image !== undefined) as string[]
 
 		// Fetch them
 		// const imageData = await Promise.all(images.map(fetchImage))
 		const files = await Promise.all(images.map((url, i) => fetchAndNormalizeToPng(url, `nft-${i}`)))
 		console.log(files)
-		// Call OpenAI’s image edit
-		const result = await openai.images.edit({
-			model: 'gpt-image-1',
-			prompt: imagePrompt,
-			image: files,
-			quality: 'low',
-			size: '1024x1024',
-		})
 
-		// save this to a file
-		fs.writeFileSync(
-			`./images/${vars.address}-nft-entourage.png`,
-			Buffer.from(result.data?.[0]?.b64_json || '', 'base64')
-		)
+		// Filter out failed images (null values)
+		const validFiles = files.filter((file): file is NonNullable<typeof file> => file !== null)
 
-		// upload to imgbb
-		// upload to imgbb
-		const imageBuffer = Buffer.from(result.data?.[0]?.b64_json || '', 'base64')
-		const formData = new FormData()
-		formData.append('image', new Blob([imageBuffer], { type: 'image/png' }), 'nft-entourage.png')
+		console.log(`Successfully processed ${validFiles.length}/${images.length} images`)
 
-		const uploadResponse = await fetch(
-			`https://api.imgbb.com/1/upload?expiration=60000&key=${process.env.IMGBB_API_KEY}`,
-			{
-				method: 'POST',
-				body: formData,
+		if (validFiles.length === 0) {
+			console.warn('No valid images could be fetched, falling back to SVG generation')
+			return ai.callStructuredJSON({
+				system: MEDIA_SYSTEM_PROMPT,
+				prompt: 'Generate an SVG representation of the NFTs in the highlights.',
+				schema: MediaSchema,
+			})
+		}
+
+		// Adjust prompt based on number of available images
+		const adjustedPrompt =
+			validFiles.length < 4
+				? `${imagePrompt}\n\nNote: Only ${validFiles.length} NFT image(s) available. Adjust the composition accordingly.\n\nNFTs:\n${JSON.stringify(tokens, null, 2)}`
+				: prompt
+
+		// Call OpenAI's image edit
+		const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+		try {
+			const result = await openai.images.edit({
+				model: 'gpt-image-1',
+				prompt: adjustedPrompt,
+				image: validFiles,
+				quality: 'low',
+				size: '1024x1024',
+			})
+
+			if (!result.data?.[0]?.b64_json) {
+				throw new Error('No image data returned from OpenAI')
 			}
-		)
 
-		const uploadResult = await uploadResponse.json()
-
-		console.log(uploadResult)
-		if (uploadResult.success) {
-			return {
-				kind: 'url',
-				src: uploadResult.data.url,
-				alt: 'NFT Entourage',
+			// save this to a file
+			try {
+				fs.writeFileSync(`./images/${vars.address}-nft-entourage.png`, Buffer.from(result.data[0].b64_json, 'base64'))
+			} catch (fileError) {
+				console.warn('Failed to save image to local file:', fileError)
 			}
+
+			// upload to imgbb
+			try {
+				const imageBuffer = Buffer.from(result.data[0].b64_json, 'base64')
+				const formData = new FormData()
+				formData.append('image', new Blob([imageBuffer], { type: 'image/png' }), 'nft-entourage.png')
+
+				const uploadResponse = await fetch(
+					`https://api.imgbb.com/1/upload?expiration=60000&key=${process.env.IMGBB_API_KEY}`,
+					{
+						method: 'POST',
+						body: formData,
+					}
+				)
+
+				const uploadResult = await uploadResponse.json()
+
+				console.log(uploadResult)
+				if (uploadResult.success) {
+					return {
+						kind: 'url',
+						src: uploadResult.data.url,
+						alt: 'NFT Entourage',
+					}
+				} else {
+					throw new Error(`ImgBB upload failed: ${uploadResult.error?.message || 'Unknown error'}`)
+				}
+			} catch (uploadError) {
+				console.warn('Failed to upload to ImgBB:', uploadError)
+				// Fall back to returning the base64 data if upload fails
+				return {
+					kind: 'base64',
+					src: `data:image/png;base64,${result.data[0].b64_json}`,
+					alt: 'NFT Entourage',
+				}
+			}
+		} catch (openaiError) {
+			console.error('OpenAI image generation failed:', openaiError)
+			// Fall back to SVG generation if OpenAI fails
+			return ai.callStructuredJSON({
+				system: MEDIA_SYSTEM_PROMPT,
+				prompt: 'Generate an SVG representation of the NFTs in the highlights.',
+				schema: MediaSchema,
+			})
 		}
 	},
 }

@@ -145,13 +145,5 @@ export const deps: BuilderDeps = {
 		}
 	},
 
-	get openai() {
-		const apiKey = process.env.OPENAI_API_KEY
-		if (!apiKey) {
-			console.warn('OPENAI_API_KEY not set, OpenAI features disabled')
-			throw new Error('OPENAI_API_KEY not set')
-		}
-
-		return new OpenAI({ apiKey })
-	},
+	openai: new OpenAI({ apiKey: process.env.OPENAI_API_KEY }),
 }

@@ -130,7 +130,6 @@ export async function buildWrappedCard(
 ): Promise<WrappedCard | null> {
 	console.log(`[v0] Building card: ${generator.kind}`)
 	const { ai, sanitizeSvg, tmpDir, upload, openai } = deps
-
 	try {
 		// 0) Pre-generate data if needed
 		if (generator.prePrompt) {
@@ -138,30 +137,30 @@ export async function buildWrappedCard(
 		}
 
 		// 1) Generate card data
-		// const data = await generateCardData(ai, generator, vars)
-		const data = {
-			leadInText: 'On-chain vibe check:',
-			revealText: 'Balanced Voyager with 240 tx — steady strides.',
-			highlights: [
-				{
-					label: 'Total tx',
-					value: '240',
-				},
-				{
-					label: 'Active days',
-					value: '117d',
-				},
-				{
-					label: 'Swaps',
-					value: '18',
-				},
-				{
-					label: 'DeFi ops',
-					value: '14',
-				},
-			],
-			footnote: 'Active for over 1,666 days!',
-		}
+		const data = await generateCardData(ai, generator, vars)
+		// const data = {
+		// 	leadInText: 'On-chain vibe check:',
+		// 	revealText: 'Balanced Voyager with 240 tx — steady strides.',
+		// 	highlights: [
+		// 		{
+		// 			label: 'Total tx',
+		// 			value: '240',
+		// 		},
+		// 		{
+		// 			label: 'Active days',
+		// 			value: '117d',
+		// 		},
+		// 		{
+		// 			label: 'Swaps',
+		// 			value: '18',
+		// 		},
+		// 		{
+		// 			label: 'DeFi ops',
+		// 			value: '14',
+		// 		},
+		// 	],
+		// 	footnote: 'Active for over 1,666 days!',
+		// }
 		// // Validate required fields
 		// if (!validateCardData(data, generator.kind)) {
 		// 	return null

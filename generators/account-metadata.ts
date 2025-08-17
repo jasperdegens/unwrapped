@@ -51,7 +51,7 @@ Order by “wow” factor (bigger counts first), keep labels short.
 `
 
 export const AccountMetadataGen: WrappedCardGeneratorSpec = {
-	kind: 'account_metadata',
+	kind: 'account-metadata',
 	version: 1,
 	order: 1,
 	prePrompt: async (vars) => {

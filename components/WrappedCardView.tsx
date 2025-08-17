@@ -228,10 +228,8 @@ export function WrappedCardView({ card }: { card: WrappedCard }) {
 
 							{/* Main title with neon glow */}
 							<div className="relative mt-3">
-								<h2 className="text-4xl font-black font-mono bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-magenta-400 to-green-400 relative">
-									{card.revealText}
-								</h2>
-								<h2 className="text-4xl font-black font-mono bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-magenta-400 to-green-400 absolute inset-0 top-0 left-0 hover:blur-sm transition-all duration-300 opacity-80">
+								<h2 className="crypto-heading">{card.revealText}</h2>
+								<h2 className="crypto-heading absolute inset-0 top-0 left-0 hover:blur-sm transition-all duration-300 opacity-80">
 									{card.revealText}
 								</h2>
 							</div>

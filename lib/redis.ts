@@ -1,5 +1,6 @@
+'use server'
 import { createClient } from 'redis'
-import type { WrappedCard } from '@/types/wrapped'
+import type { WrappedCard, WrappedCardCollection } from '@/types/wrapped'
 
 // Initialize Redis client
 let redis: ReturnType<typeof createClient> | null = null
@@ -20,59 +21,100 @@ async function getRedisClient() {
 	return redis
 }
 
-// Generate a unique key for storing cards
-function generateCardKey(generatorId: string, address: string): string {
-	return `card:${generatorId}:${address.toLowerCase()}`
+// Generate a unique key for storing collections
+function generateCollectionKey(address: string): string {
+	return `collection:${address.toLowerCase()}`
 }
 
-// Store a card in Redis
-export async function storeCard(generatorId: string, address: string, card: WrappedCard): Promise<void> {
+// Get entire collection for an address
+export async function getCollection(address: string): Promise<WrappedCardCollection | null> {
 	try {
 		const client = await getRedisClient()
-		const lowerAddress = address.toLowerCase()
-		const key = generateCardKey(generatorId, lowerAddress)
-		const data = {
-			generatorId,
-			address: lowerAddress,
-			card,
+		const key = generateCollectionKey(address)
+		const data = await client.get(key)
+
+		if (data) {
+			const parsed = JSON.parse(data) as WrappedCardCollection
+			console.log(`[Redis] Retrieved collection for ${address}`)
+			return parsed
+		}
+
+		return null
+	} catch (error) {
+		console.error('[Redis] Error retrieving collection:', error)
+		return null
+	}
+}
+
+export async function setCollection(collection: WrappedCardCollection): Promise<void> {
+	try {
+		const client = await getRedisClient()
+		const key = generateCollectionKey(collection.address)
+		await client.setEx(key, 86400, JSON.stringify(collection))
+	} catch (error) {
+		console.error('[Redis] Error setting collection:', error)
+	}
+}
+
+// Set a card in a collection, replacing existing card if it exists with same kind
+export async function setCardInCollection(address: string, card: WrappedCard): Promise<void> {
+	try {
+		const client = await getRedisClient()
+		const key = generateCollectionKey(address)
+
+		// Get existing collection or create new one
+		const collection: WrappedCardCollection = (await getCollection(address)) || {
+			address: address as `0x${string}`,
+			cards: [],
 			timestamp: new Date().toISOString(),
 		}
 
-		// Store with 24 hour expiration
-		await client.setEx(key, 86400, JSON.stringify(data))
-		console.log(`[Redis] Stored card for ${generatorId}:${lowerAddress}`)
+		// Check if card with same kind already exists and replace it
+		const existingCardIndex = collection.cards.findIndex((c) => c.kind === card.kind)
+		if (existingCardIndex !== -1) {
+			// Replace existing card
+			collection.cards[existingCardIndex] = card
+			console.log(`[Redis] Replaced existing card of kind ${card.kind} for ${address}`)
+		} else {
+			// Add new card
+			collection.cards.push(card)
+			console.log(`[Redis] Added new card of kind ${card.kind} for ${address}`)
+		}
+
+		// Update timestamp
+		collection.timestamp = new Date().toISOString()
+		console.log('collection cards', collection.cards.length)
+
+		// Store collection with 24 hour expiration
+		await client.setEx(key, 86400, JSON.stringify(collection))
+		console.log(`[Redis] Stored collection for ${address} with ${collection.cards.length} cards`)
 	} catch (error) {
-		console.error('[Redis] Error storing card:', error)
+		console.error('[Redis] Error setting card in collection:', error)
 		// Don't throw - Redis failures shouldn't break the main flow
 	}
 }
 
-// Retrieve a card from Redis
+// Legacy function for backward compatibility - now gets the entire collection
 export async function getCard(generatorId: string, address: string): Promise<WrappedCard | null> {
 	try {
-		const client = await getRedisClient()
-		const key = generateCardKey(generatorId, address)
-		const data = await client.get(key)
+		const collection = await getCollection(address)
+		if (!collection) return null
 
-		if (data) {
-			const parsed = JSON.parse(data) as {
-				generatorId: string
-				address: string
-				card: WrappedCard
-				timestamp: string
-			}
-			console.log(`[Redis] Retrieved cached card for ${generatorId}:${address}`)
-			return parsed.card
-		}
-
-		return null
+		// Find card by kind (assuming generatorId maps to card kind)
+		const card = collection.cards.find((c) => c.kind === generatorId)
+		return card || null
 	} catch (error) {
 		console.error('[Redis] Error retrieving card:', error)
 		return null
 	}
 }
 
-// Check if Redis is available
-export function isRedisAvailable(): boolean {
-	return !!process.env.REDIS_URL
+// Legacy function for backward compatibility - now uses setCardInCollection
+export async function storeCard(generatorId: string, address: string, card: WrappedCard): Promise<void> {
+	// Map the legacy parameters to the new collection-based approach
+	const cardWithKind = {
+		...card,
+		kind: generatorId,
+	}
+	await setCardInCollection(address, cardWithKind)
 }
